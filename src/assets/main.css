@@ -1,0 +1,99 @@
+:root {
+  --root-background: #0f0f11;
+  --background: rgba(255, 255, 255, 0.25);
+  --middleground: rgba(255, 255, 255, 0.25);
+  --forground: white;
+  --text-color: #fefefe;
+}
+body {
+  background: var(--root-background);
+  color: var(--text-color);
+  font-family: 'Haas Grot Text R Web', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+section {
+  /* border-radius: 15px;
+  padding: 15px 10px;
+  margin: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18); */
+  background: var(--background);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+input {
+  /* background: var(--element);
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  transition: color 0.3s ease-out; */
+  padding: 10px;
+  outline: none;
+  border: none;
+  border-radius: 6px;
+}
+.error {
+  outline: 2px solid red;
+  outline: 2px solid #ff2121;
+}
+
+button {
+  padding: 10px;
+  outline: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Positioning */
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid {
+  display: grid;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.gutter-md {
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+}
+
+.gutter-sm {
+  grid-row-gap: 5px;
+  grid-column-gap: 5px;
+}
+
+/* Typeography */
+.text-center {
+  text-align: center;
+}
+
+h1 {
+  padding: 0;
+  line-hight: 1;
+}
+h2 {
+  padding: 0;
+  line-hight: 1;
+  font-size: 18px;
+}
+
+.text-subtitle-1 {
+  font-size: 18px;
+}
