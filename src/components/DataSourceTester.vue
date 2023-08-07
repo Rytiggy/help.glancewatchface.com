@@ -6,6 +6,7 @@ import InputElement from '../components/InputElement.vue'
 import ButtonElement from "./ButtonElement.vue";
 const glance = useGlance()
 const url = ref("")
+const token = ref("")
 
 const isUrlValidFormat = computed(() => {
   if (url.value.length === 0)
@@ -30,7 +31,19 @@ const apiError = computed(() => {
   return glance.error.value
 })
 
+const isUnauthorized = computed(() => {
+  return apiError.value && apiError.value.error.status === 401
+})
+
+function buildUrlWithToken() {
+  const urlObj = new URL(url.value)
+  urlObj.searchParams.append('token', token.value);
+  url.value = urlObj.href
+}
+
 async function next() {
+  if (token.value)
+    buildUrlWithToken()
   await glance.getData(url.value)
   await glance.processData(apiData.value)
 }
@@ -62,7 +75,10 @@ function isReadingOld(bgDate) {
         <h2>What does this tool do?</h2>
         <ol>
           <li>
-            Validate the format of your data source's url.
+            This tool is for the "custom" data source option in Glance's settings
+          </li>
+          <li>
+            Validate the format of your data source's url
           </li>
           <li>
             Validate that the data is okay and ready for Glance
@@ -75,9 +91,8 @@ function isReadingOld(bgDate) {
       <div class="grid gutter-md">
         <InputElement label="Nightscout url" v-model="url" :error="!isUrlValidFormat" />
 
-        <InputElement v-if="apiError && apiError.error.status === 401"
-          label="Nightscout Token - Your Nightscout site requires authentication " v-model="token"
-          :error="apiError.error.status === 401" />
+        <InputElement v-if="isUnauthorized" label="Nightscout Token - Your Nightscout site requires authentication "
+          v-model="token" :error="token.length === 0" />
 
         <ButtonElement label="Validate" :disabled="!isUrlValidFormat" @click="next" />
       </div>
