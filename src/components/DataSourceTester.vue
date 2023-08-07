@@ -5,7 +5,7 @@ import { useGlance } from "./glance/useGlance"
 import InputElement from '../components/InputElement.vue'
 import ButtonElement from "./ButtonElement.vue";
 const glance = useGlance()
-const url = ref("https://balwtallyho.my.nightscoutpro.com/pebble?token=glance-678bebd9a52b2ef0&count=47")
+const url = ref("")
 
 const isUrlValidFormat = computed(() => {
   if (url.value.length === 0)
