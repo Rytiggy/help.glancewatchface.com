@@ -7,7 +7,9 @@ import ButtonElement from "./ButtonElement.vue";
 const glance = useGlance()
 const url = ref("")
 const token = ref("")
-
+const dataSource = ref("")
+const dexcomUsername = ref("")
+const dexcomPassword = ref("")
 const isUrlValidFormat = computed(() => {
   if (url.value.length === 0)
     return false
@@ -27,6 +29,11 @@ const apiData = computed(() => {
   return glance.data.value
 })
 
+const processedData = computed(() => {
+  return glance.processedData.value
+})
+
+
 const apiError = computed(() => {
   return glance.error.value
 })
@@ -42,8 +49,17 @@ function buildUrlWithToken() {
 }
 
 async function next() {
-  if (token.value)
+  console.log({ dataSource: dataSource.value })
+  if (token.value && dataSource.value === 'nightscout') {
     buildUrlWithToken()
+  } else if (dataSource.value === 'dexcom') {
+    glance.setSettings("USAVSInternational", false)
+    console.log(dexcomUsername.value, dexcomPassword.value)
+    glance.setSettings("dexcomUsername", dexcomUsername.value)
+    glance.setSettings("dexcomPassword", dexcomPassword.value)
+    url.value = "dexcom"
+  }
+
   await glance.getData(url.value)
   await glance.processData(apiData.value)
 }
@@ -65,6 +81,17 @@ function isReadingOld(bgDate) {
   return false
 }
 
+
+function setDataSource(val) {
+  if (val === 'dexcom') {
+    glance.setSettings("url", "dexcom")
+    glance.setSettings("dataSource", "dexcom")
+  }
+
+  dataSource.value = val
+}
+
+
 </script>
 <template>
   <div class="grid gutter-md">
@@ -75,10 +102,10 @@ function isReadingOld(bgDate) {
         <h2>What does this tool do?</h2>
         <ol>
           <li>
-            This tool is for the "custom" data source option in Glance's settings
+            This tool is for the "custom" data source and "Dexcom" option in Glance's settings
           </li>
           <li>
-            Validate the format of your data source's url
+            Validate the format of your data source's settings
           </li>
           <li>
             Validate that the data is okay and ready for Glance
@@ -87,29 +114,52 @@ function isReadingOld(bgDate) {
       </div>
     </section>
     <section>
-      <h2>Enter the URL of your Nightscout site</h2>
-      <div class="grid gutter-md">
-        <InputElement label="Nightscout url" v-model="url" :error="!isUrlValidFormat" />
+      <h2>Select your data source</h2>
+      <div class="gutter-md">
+        <div class="grid gutter-md">
+          <ButtonElement label="Dexcom" @click="setDataSource('dexcom')" />
+          <ButtonElement label="Nightscout" @click="setDataSource('nightscout')" />
+        </div>
 
-        <InputElement v-if="isUnauthorized" label="Nightscout Token - Your Nightscout site requires authentication "
-          v-model="token" :error="token.length === 0" />
-
-        <ButtonElement label="Validate" :disabled="!isUrlValidFormat" @click="next" />
       </div>
     </section>
-    <section v-if="apiData">
+
+    <section v-if="dataSource.length">
+      <div class="gutter-md">
+        <div v-if="dataSource === 'dexcom'" class="grid gutter-md">
+          <h2>Dexcom</h2>
+          <InputElement label="Dexcom Username" v-model="dexcomUsername" />
+          <InputElement label="Dexcom Password" v-model="dexcomPassword" />
+          <ButtonElement label="Validate" :disabled="dexcomUsername.length === 0 || dexcomPassword.length === 0"
+            @click="next" />
+
+        </div>
+        <div v-else-if="dataSource === 'nightscout'" class="grid gutter-md">
+          <h2>Nightscout</h2>
+
+          <InputElement label="Nightscout url" v-model="url" :error="!isUrlValidFormat" />
+
+          <InputElement v-if="isUnauthorized" label="Nightscout Token - Your Nightscout site requires authentication "
+            v-model="token" :error="token.length === 0" />
+          <ButtonElement label="Validate" :disabled="!isUrlValidFormat" @click="next" />
+
+        </div>
+
+      </div>
+    </section>
+    <section v-if="processedData">
       <h2>Data</h2>
       <div class="grid gutter-md">
-        <div v-if="apiData.bgs && apiData.bgs[0].datetime">
-          Live Readings: {{ isReadingOld(apiData.bgs[0].datetime) == false ? "Okay" : "Issues" }}
+        <div v-if="processedData.bgs && processedData.bgs[0].datetime">
+          Live Readings: {{ isReadingOld(processedData.bgs[0].datetime) == false ? "Okay" : "Issues" }}
         </div>
 
-        <div v-if="apiData.bgs">
-          Data in expected format: {{ !!apiData.bgs ? "Okay" : "Issues" }}
+        <div v-if="processedData.bgs">
+          Data in expected format: {{ !!processedData.bgs ? "Okay" : "Issues" }}
         </div>
 
-        <div v-if="apiData.bgs">
-          47 Readings Available: {{ apiData.bgs.length === 47 ? "Okay" : "Issues" }}
+        <div v-if="processedData.bgs">
+          47 Readings Available: {{ processedData.bgs.length === 47 ? "Okay" : "Issues" }}
         </div>
 
 

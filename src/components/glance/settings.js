@@ -1,6 +1,6 @@
 export default class settings {
-    get() {
-        let settings = {
+    constructor() {
+        this.settings = {
             url: "",
             extraDataUrl: "",
             dataSource: "custom",
@@ -35,7 +35,15 @@ export default class settings {
             resetAlertDismissal: "",
             staleData: "",
             staleDataAlertAfter: "",
-        };
-        return settings;
+        }
+    }
+
+
+    get() {
+        return this.settings;
+    }
+
+    set(key, value) {
+        this.settings[key] = value
     }
 }
